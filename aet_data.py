@@ -37,7 +37,7 @@ def validate_password(_password):
     #Check if the password has less than 6 symbols
     if (len(_password) < 6):
         error_count += 1
-        console.print_message("Invalid password: The password needs to be at least 8 characters long.", type="error")
+        console.print_message("Invalid password: The password needs to be at least six characters long.", type="error")
 
     #Check if the password has more than 20 symbols
     if (len(_password) > 20):
