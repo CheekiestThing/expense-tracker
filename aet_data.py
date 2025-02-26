@@ -72,6 +72,7 @@ def create_user(username : str, password : str, phone : str):
     new_user["username"] = username
     new_user["password"] = password
     new_user["phone"] = phone
+    new_user["spending_limit"] = 500
     new_user["purchases"] = []
     return new_user
 

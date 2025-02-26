@@ -1,6 +1,7 @@
 import sys
 import re
 from datetime import datetime
+from datetime import timedelta
 from time import sleep
 
 # AET Modules
@@ -30,7 +31,7 @@ def state_boot():
             close_program()
         case "OFFLINE":
             current_user = users[0]
-            debug_purchase = data.create_purchase(date_of_purchase="19/06/2013", item_name="Minecraft (Java/Bedrock), digital copy", weight=0, price=29.99, quantity=1)
+            debug_purchase = data.create_purchase(date_of_purchase="19/06/2013", item_name="Minecraft, digital copy", weight=0, price=19.99, quantity=1)
             current_user["purchases"].append(debug_purchase)
             debug_purchase = data.create_purchase(date_of_purchase="26/06/2013", item_name="GeForce GTX 780 graphics card", weight=1.77, price=575, quantity=1)
             current_user["purchases"].append(debug_purchase)
@@ -268,9 +269,10 @@ def state_report():
 
     cheapest_order = (99999999999, "N/A", 0, "01/01/1970")
     most_expensive_order = (0, "N/A", 0, "01/01/1970")
+    newest_order = (0, "N/A", 0, "01/01/1970")
+    oldest_order = (0, "N/A", 0, "28/12/9999")
 
-    spending_limit = 500
-    spending_limit_exceeded = False
+    spending_limit = current_user["spending_limit"]
 
     for item in purchases:
         # Calulate the prices for each order
@@ -292,6 +294,17 @@ def state_report():
         if (order_cost < cheapest_order[0]):
             cheapest_order = (order_cost, item_name, quantity, date_of_purchase)
 
+        # Check if each other is either the newest or oldest
+        current_datetime = datetime.strptime(date_of_purchase, r"%d/%m/%Y")
+
+        newest_datetime = datetime.strptime(newest_order[3], r"%d/%m/%Y")
+        if ((current_datetime - newest_datetime).days > timedelta(0).days):
+            newest_order = (order_cost, item_name, quantity, date_of_purchase)
+            
+        oldest_datetime = datetime.strptime(oldest_order[3], r"%d/%m/%Y")
+        if ((current_datetime - oldest_datetime).days < 0):
+            oldest_order = (order_cost, item_name, quantity, date_of_purchase)
+
     # Check if the user has exceeded their spending limit of 500 Euro
     total_costs = total_item_costs + total_shipping_costs
     spending_limit_exceeded = total_costs > spending_limit
@@ -300,17 +313,22 @@ def state_report():
     creation_date = datetime.now()
 
     console.print_header("Your Report")
+    console.print_message(f"Report for {current_user["username"]}", type="data")
     console.print_message(f"Report created: {creation_date.strftime(f'%Y-%m-%d at %H:%M:%S')}", type="data")
     console.print_message(f"Total costs (without shipping): {console.price(total_item_costs)}", type="data")
     console.print_message(f"Total shipping costs: {console.price(total_shipping_costs)}", type="data")
+
     if most_expensive_order[1] == "N/A":
         console.print_message(f"Most expensive order: N/A", type="data")
+        console.print_message(f"Least expensive order: N/A", type="data")
+        console.print_message(f"Latest order: N/A", type="data")
+        console.print_message(f"Oldest order: N/A", type="data")
     else:
         console.print_message(f"Most expensive order: {most_expensive_order[2]}x \"{most_expensive_order[1]}\" for {console.price(most_expensive_order[0]) } (ordered on {most_expensive_order[3]})", type="data")
-    if cheapest_order[1] == "N/A":
-        console.print_message(f"Least expensive order: N/A", type="data")
-    else:
         console.print_message(f"Least expensive order: {cheapest_order[2]}x \"{cheapest_order[1]}\" for {console.price(cheapest_order[0])} (ordered on {cheapest_order[3]})", type="data")
+        console.print_message(f"Latest order: {newest_order[2]}x \"{newest_order[1]}\" for {console.price(newest_order[0])} (ordered on {newest_order[3]})", type="data")
+        console.print_message(f"Oldest order: {oldest_order[2]}x \"{oldest_order[1]}\" for {console.price(oldest_order[0])} (ordered on {oldest_order[3]})", type="data")
+
     if (spending_limit_exceeded):
         console.print_message(f"You have exceeded your set spending limit of {spending_limit}€ by {console.price(total_costs-spending_limit)}!", type="error")
     else:
