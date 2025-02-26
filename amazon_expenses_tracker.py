@@ -41,7 +41,7 @@ def close_program():
     '''Displays a thank you message before closing the program.'''
     console.clear()
     console.print_message("Thank you for using the Amazon Expense Tracker! The program is closing now.")
-    sleep(2)
+    console.loading_bar()
     exit()
 
 def state_register(_username = "", _password = "", _phone = ""):
@@ -66,11 +66,6 @@ def state_register(_username = "", _password = "", _phone = ""):
 
     _password = data.validate_password(_password)
 
-    if (_phone != ""):
-        console.clear()
-        console.print_message("Registration complete!")
-        sleep(1)
-
     '''
         Two-Factor-Authentication
     '''
@@ -86,7 +81,7 @@ def state_register(_username = "", _password = "", _phone = ""):
     console.clear()
     sleep(1)
 
-    console.print_message("Your account has been created!", type="confirm")
+    console.print_message("Your account has been created! You may now log in.", type="confirm")
     sleep(3)
     state_boot()
 
@@ -97,7 +92,7 @@ def state_login():
     attempts = 0
     console.display_login_prompt()
 
-    print(users)
+    #print(users) <= For Debugging
     _username = data.input_prompt("Username")
     _password = data.input_prompt("Password")
 
@@ -147,6 +142,8 @@ def state_menu():
     '''
         state_menu()
     '''
+    global current_user
+
     console.display_user_menu()
     option = data.input_prompt()
 
@@ -157,7 +154,13 @@ def state_menu():
         case "1":
             state_enter_purchase()
         case "2":
-            state_report()
+            if (len(current_user["purchases"]) > 0):
+                state_report()
+            else:
+                console.print_header("Your Report")
+                console.print_message("Please enter at least purchase before attempting to generate a report!", type="error")
+                sleep(3)
+                state_menu()
         case "3":
             close_program()
 
@@ -207,7 +210,7 @@ def state_enter_purchase():
         except:
             console.display_item_prompt(new_purchase)
             console.print_message("Invalid format. Make sure to enter a valid amount", type="error")
-            console.print_message("Enter the price of the item (in EUR)")
+            console.print_message("Enter the price of the item (in €)")
             price = data.input_prompt()
     new_purchase["price"] = float(price)
 
@@ -258,7 +261,7 @@ def state_report():
     '''The state of the program during which a user receives a report on their purchases.'''
     global current_user
 
-    console.clear()
+    console.print_header("Your Report")
     console.loading_bar()
 
     #First, grab the purchases for the current user
@@ -348,7 +351,6 @@ if len(sys.argv) > 3:
     users.append(data.create_user(username=sys.argv[1], password=sys.argv[2], phone=sys.argv[3]))
 
 # Boot up message
-console.print_header("Welcome to Amazon!")
-
+console.display_title()
 console.loading_bar()
 state_boot()

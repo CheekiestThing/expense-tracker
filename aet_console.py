@@ -21,24 +21,29 @@ def print_message(text : str = "", type : str = "", flush : bool = False, end : 
             _output = "\033[0;32m" + _output + "\033[1;0m"
         case "data":
             _output = "\033[0;34m" + _output + "\033[1;0m"
+        case "note":
+            _output = "\033[0;36m" + _output + "\033[1;0m"
             
     print(_output, flush = flush, end = end)
 
 def loading_bar():
     '''Creates a loading bar that briefly interupts the program.'''
     sleep(0.5)
-    output = "\r█"
-    print(output, end="", flush=True)
+    output = "\r███"
+    print("\033[1;34m" + output, end="", flush=True)
 
-    sleep(0.5)
+    sleep(1)
     while len(output) < 40:
         output += "█"
         print("\033[1;34m" + output, end="", flush=True)
         sleep(0.00663)
 
     output += "█"
-    print("\033[1;32m" + output + "\033[1;0m", flush=True)
-    sleep(1.5)
+    print("\033[1;32m" + output + "\033[1;0m", end="", flush=True)
+    for i in range(4):
+        print("")
+        sleep(0.33)
+    sleep(1)
 
 def display_item(item : dict):
     output = ""
@@ -47,7 +52,7 @@ def display_item(item : dict):
             case "date_of_purchase":
                 output += "Date of Purchase: " + item[key]
             case "item_name":
-                output += "  Item Name: " + item[key]
+                output += "  Item Name: \"" + item[key] + "\""
             case "price":
                 output += "  Price: " + price(item[key])
             case "weight":
@@ -87,12 +92,17 @@ def display_login_prompt():
     print_header("Log in")
 
 def display_menu():
-    '''Prints the first menu prompt.'''
-    print_header("Welcome to Amazon!")
+    '''Prints the first menu prompt as well as the title.'''
+    display_title()
     print_message("What would you like to do?")
     print_message("  1. Log in using an existing Account")
     print_message("  2. Create a new Account")
     print_message("  3. Quit")
+
+def display_title():
+    '''Prints the title of the program'''
+    print_header("Welcome to the Amazon Expense Tracker!")
+    print_message("AET by CheekiestThing, Version 1.1", type="note")
 
 def display_user_menu():
     '''Prints the User menu prompt.'''
