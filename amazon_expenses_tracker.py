@@ -31,9 +31,9 @@ def state_boot():
             close_program()
         case "OFFLINE":
             current_user = users[0]
-            debug_purchase = data.create_purchase(date_of_purchase="19/06/2013", item_name="Minecraft, digital copy", weight=0, price=19.99, quantity=1)
+            debug_purchase = data.create_purchase(date_of_purchase="06/19/2013", item_name="Minecraft, digital copy", weight=0, price=19.99, quantity=1)
             current_user["purchases"].append(debug_purchase)
-            debug_purchase = data.create_purchase(date_of_purchase="26/06/2013", item_name="GeForce GTX 780 graphics card", weight=1.77, price=575, quantity=1)
+            debug_purchase = data.create_purchase(date_of_purchase="06/26/2013", item_name="GeForce GTX 780 graphics card", weight=1.77, price=575, quantity=1)
             current_user["purchases"].append(debug_purchase)
             state_menu()
 
@@ -273,7 +273,7 @@ def state_report():
     cheapest_order = (99999999999, "N/A", 0, "01/01/1970")
     most_expensive_order = (0, "N/A", 0, "01/01/1970")
     newest_order = (0, "N/A", 0, "01/01/1970")
-    oldest_order = (0, "N/A", 0, "28/12/9999")
+    oldest_order = (0, "N/A", 0, "12/28/9999")
 
     spending_limit = current_user["spending_limit"]
 
@@ -298,13 +298,13 @@ def state_report():
             cheapest_order = (order_cost, item_name, quantity, date_of_purchase)
 
         # Check if each other is either the newest or oldest
-        current_datetime = datetime.strptime(date_of_purchase, r"%d/%m/%Y")
+        current_datetime = datetime.strptime(date_of_purchase, r"%m/%d/%Y")
 
-        newest_datetime = datetime.strptime(newest_order[3], r"%d/%m/%Y")
+        newest_datetime = datetime.strptime(newest_order[3], r"%m/%d/%Y")
         if ((current_datetime - newest_datetime).days > timedelta(0).days):
             newest_order = (order_cost, item_name, quantity, date_of_purchase)
             
-        oldest_datetime = datetime.strptime(oldest_order[3], r"%d/%m/%Y")
+        oldest_datetime = datetime.strptime(oldest_order[3], r"%m/%d/%Y")
         if ((current_datetime - oldest_datetime).days < 0):
             oldest_order = (order_cost, item_name, quantity, date_of_purchase)
 
@@ -317,7 +317,7 @@ def state_report():
 
     console.print_header("Your Report")
     console.print_message(f"Report for {current_user["username"]}", type="data")
-    console.print_message(f"Report created: {creation_date.strftime(f'%Y-%m-%d at %H:%M:%S')}", type="data")
+    console.print_message(f"Report created: {creation_date.strftime(f'%m/%d/%Y at %H:%M:%S')}", type="data")
     console.print_message(f"Total costs (without shipping): {console.price(total_item_costs)}", type="data")
     console.print_message(f"Total shipping costs: {console.price(total_shipping_costs)}", type="data")
 
